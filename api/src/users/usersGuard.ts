@@ -1,19 +1,18 @@
 import Joi from 'joi';
 
-import { constants, userRolesEnum } from '../constants/index.js';
+import { constants, userRoles } from '../constants/index.js';
 
 const { EMAIL_REGEX, PASS_REGEX } = constants;
 
-export class UsersGuard {
-    public static createUserValidator = Joi.object({
+export class UsersGuard { static createUserValidator = Joi.object({
         id: Joi.string().trim().required(),
         name: Joi.string().trim().alphanum().min(3).max(20).required(),
         email: Joi.string().trim().regex(EMAIL_REGEX).required(),
         password: Joi.string().trim().regex(PASS_REGEX).required(),
         role: Joi.string()
             .trim()
-            .allow(...Object.values(userRolesEnum))
-            .default(userRolesEnum.USER),
+            .allow(...Object.values(userRoles))
+            .default(userRoles.USER),
     });
 
     public static updateUserValidator = Joi.object({
@@ -22,6 +21,6 @@ export class UsersGuard {
         password: Joi.string().trim().regex(PASS_REGEX),
         role: Joi.string()
             .trim()
-            .allow(...Object.values(userRolesEnum)),
-    });
+            .allow(...Object.values(userRoles)),
+    }).min(1);
 }

@@ -22,13 +22,13 @@ export class UsersController {
     @Version('1')
     @HttpCode(HttpStatus.OK)
     findAll(@Query('offset') offset = 0, @Query('limit') limit = 25) {
-        const users = this.usersService.getAllUsers();
+        const [users, count] = this.usersService.getAllUsers(+offset, +limit);
 
         return {
             users,
             limit: +limit,
             offset: +offset,
-            count: users.length,
+            count,
         };
     }
 
@@ -60,6 +60,6 @@ export class UsersController {
     @Version('1')
     @HttpCode(HttpStatus.NO_CONTENT)
     deleteUser(@Param() params) {
-        this.usersService.deleteUser(params.id)
+        this.usersService.deleteUser(params.id);
     }
 }

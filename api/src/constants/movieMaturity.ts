@@ -1,4 +1,4 @@
-export const movieMaturityEnum = {
+export const movieMaturity = {
     G: 'G',
     PG: 'PG',
     R: 'R',

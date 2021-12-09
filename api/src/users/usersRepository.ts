@@ -1,7 +1,7 @@
 import { UserDto } from '.';
 
 export class UserRepository {
-    constructor(public users: UserDto[]) {
+    constructor(private users: UserDto[]) {
         this.users = users;
     }
 
@@ -21,19 +21,24 @@ export class UserRepository {
         });
     }
 
+    public getUsers(offset: number, limit: number): [UserDto[], number] {
+        const usersSelection = this.users.slice(offset, limit);
+        return [usersSelection, this.users.length];
+    }
+
     public updateUser(id: string, user: UserDto): UserDto {
         const userToUpdate = this.getUser(id);
         Object.keys(user).forEach((key) => {
             userToUpdate[key] = user[key];
         });
 
-        return this.getUser(id);
+        return userToUpdate;
     }
 
     public checkIfUserExists(id: string): boolean {
         const user = this.getUser(id);
         if (user) return true;
-        
+
         return false;
     }
 }

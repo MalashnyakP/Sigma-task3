@@ -10,8 +10,8 @@ export class UsersService {
         this.userRepository = new UserRepository([]);
     }
 
-    getAllUsers(): UserDto[] {
-        return this.userRepository.users;
+    getAllUsers(offset: number, limit: number): [UserDto[], number] {
+        return this.userRepository.getUsers(offset, limit);
     }
 
     getUserById(id: string): UserDto {
@@ -52,6 +52,7 @@ export class UsersService {
         if (error) {
             throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
+        id = value.id;
 
         if (!this.userRepository.checkIfUserExists(id)) {
             throw new HttpException(
@@ -59,7 +60,6 @@ export class UsersService {
                 HttpStatus.BAD_REQUEST,
             );
         }
-        id = value.id;
         this.userRepository.deleteUser(id);
     }
 

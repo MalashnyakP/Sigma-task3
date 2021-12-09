@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import { constants, movieMaturityEnum } from '../constants';
+import { constants, movieMaturity } from '../constants/index.js';
 
 const { CURR_YEAR, RUNTIME_REGEX } = constants;
 
@@ -14,7 +14,7 @@ export class MoviesGuard {
         year: Joi.number().min(1950).max(CURR_YEAR).required(),
         maturity: Joi.string()
             .trim()
-            .allow(...Object.values(movieMaturityEnum))
+            .allow(...Object.values(movieMaturity))
             .required(),
         runtime: Joi.string().trim().regex(RUNTIME_REGEX).required(),
         genre: Joi.string().trim().required(),
@@ -30,12 +30,12 @@ export class MoviesGuard {
         year: Joi.number().min(1950).max(CURR_YEAR),
         maturity: Joi.string()
             .trim()
-            .allow(...Object.values(movieMaturityEnum)),
+            .allow(...Object.values(movieMaturity)),
         runtime: Joi.string().trim().regex(RUNTIME_REGEX),
         genre: Joi.string().trim(),
         cast: Joi.array().min(2).items(MoviesGuard.staffSchema),
         director: MoviesGuard.staffSchema,
         logo: Joi.string().trim(),
         backgroundImg: Joi.string().trim(),
-    });
+    }).min(1);
 }
