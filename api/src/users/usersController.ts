@@ -12,7 +12,7 @@ import {
     HttpStatus,
 } from '@nestjs/common';
 
-import { UserDto, UsersService } from './index.js';
+import { UserDto, UsersService } from '.';
 
 @Controller('users')
 export class UsersController {

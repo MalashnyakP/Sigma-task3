@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
-import { constants, movieMaturity } from '../constants/index.js';
+import { movieMaturity, utils } from '../constants';
 
-const { CURR_YEAR, RUNTIME_REGEX } = constants;
+const { CURR_YEAR, RUNTIME_REGEX } = utils;
 
 export class MoviesGuard {
     private static staffSchema = Joi.string().trim().min(3).max(30);

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { MovieDto, MoviesGuard, MoviesRepository } from './index.js';
-import { GenericGuard } from '../genericGuard.js';
-import { validateObject } from '../utils/index.js';
+import { MovieDto, MoviesGuard, MoviesRepository } from '.';
+import { GenericGuard } from '../genericGuard';
+import { validateObject } from '../utils';
 
 @Injectable()
 export class MoviesService {
@@ -56,7 +56,7 @@ export class MoviesService {
         if (!this.moviesRepository.checkIfMovieExists(id)) {
             throw new HttpException(
                 `No movie with id: ${id} was found.`,
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.NOT_FOUND,
             );
         }
         this.moviesRepository.deleteMovie(id);
@@ -82,7 +82,7 @@ export class MoviesService {
         if (!this.moviesRepository.checkIfMovieExists(id)) {
             throw new HttpException(
                 `No user with id: ${id} was found.`,
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.NOT_FOUND,
             );
         }
 

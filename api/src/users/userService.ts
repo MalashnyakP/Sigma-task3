@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { UserDto, UsersGuard, UserRepository } from './index.js';
-import { validateObject } from '../utils/index.js';
-import { GenericGuard } from '../genericGuard.js';
+import { UserDto, UsersGuard, UserRepository } from '.';
+import { validateObject } from '../utils';
+import { GenericGuard } from '../genericGuard';
 
 @Injectable()
 export class UsersService {
@@ -57,7 +57,7 @@ export class UsersService {
         if (!this.userRepository.checkIfUserExists(id)) {
             throw new HttpException(
                 `No user with id: ${id} was found.`,
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.NOT_FOUND,
             );
         }
         this.userRepository.deleteUser(id);
@@ -75,7 +75,7 @@ export class UsersService {
         if (!this.userRepository.checkIfUserExists(id)) {
             throw new HttpException(
                 `No user with id: ${id} was found.`,
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.NOT_FOUND,
             );
         }
 

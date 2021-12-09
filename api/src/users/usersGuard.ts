@@ -1,10 +1,11 @@
 import Joi from 'joi';
 
-import { constants, userRoles } from '../constants/index.js';
+import { userRoles, utils } from '../constants';
 
-const { EMAIL_REGEX, PASS_REGEX } = constants;
+const { EMAIL_REGEX, PASS_REGEX } = utils;
 
-export class UsersGuard { static createUserValidator = Joi.object({
+export class UsersGuard {
+    static createUserValidator = Joi.object({
         id: Joi.string().trim().required(),
         name: Joi.string().trim().alphanum().min(3).max(20).required(),
         email: Joi.string().trim().regex(EMAIL_REGEX).required(),

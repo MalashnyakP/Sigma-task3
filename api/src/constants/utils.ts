@@ -1,4 +1,4 @@
-export const constants = {
+export const utils = {
     CURR_YEAR: new Date().getFullYear(),
 
     PASS_REGEX: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,128})/,

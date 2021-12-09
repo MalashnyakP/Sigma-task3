@@ -11,7 +11,7 @@ import {
     Query,
     Version,
 } from '@nestjs/common';
-import { MovieDto, MoviesService } from './index.js';
+import { MovieDto, MoviesService } from '.';
 
 @Controller('movies')
 export class MoviesController {

@@ -1,6 +1,6 @@
-export { MovieDto } from './movieDto.js';
-export { MoviesRepository } from './moviesRepository.js';
-export { MoviesGuard } from './moviesGuard.js';
-export { MoviesService } from './moviesService.js';
-export { MoviesController } from './moviesController.js';
-export { MoviesModule } from './moviesModule.js';
+export { MovieDto } from './movieDto';
+export { MoviesRepository } from './moviesRepository';
+export { MoviesGuard } from './moviesGuard';
+export { MoviesService } from './moviesService';
+export { MoviesController } from './moviesController';
+export { MoviesModule } from './moviesModule';

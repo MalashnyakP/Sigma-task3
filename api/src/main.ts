@@ -1,8 +1,8 @@
 import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
-import { AppModule } from './appModule.js';
-import { HttpExceptionFilter } from './httpExeptionHandler.js';
+import { AppModule } from './appModule';
+import { HttpExceptionFilter } from './httpExeptionHandler';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
