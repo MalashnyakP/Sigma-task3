@@ -1,8 +1,9 @@
 import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { AppModule } from './appModule';
-import { HttpExceptionFilter } from './httpExeptionHandler';
+import { AppModule } from './appModule.js';
+import { HttpExceptionFilter } from './httpExeptionHandler.js';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -11,6 +12,14 @@ async function bootstrap() {
     app.enableVersioning({
         type: VersioningType.URI,
     });
+
+    const options = new DocumentBuilder()
+        .setTitle('Movies API')
+        .setDescription('Korean movies API')
+        .setVersion('1')
+        .build();
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup('api', app, document);
 
     await app.listen(5000);
 }

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { MovieDto, MoviesGuard, MoviesRepository } from '.';
-import { GenericGuard } from '../genericGuard';
-import { validateObject } from '../utils';
+import { MovieDto, MoviesGuard, MoviesRepository } from './index.js';
+import { GenericGuard } from '../genericGuard.js';
+import { validateObject } from '../utils/index.js';
 
 @Injectable()
 export class MoviesService {
@@ -16,7 +16,7 @@ export class MoviesService {
     getMovieById(id: string): MovieDto {
         const [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
 
         id = value.id;
@@ -38,7 +38,7 @@ export class MoviesService {
         );
 
         if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
         movie = value;
         this.moviesRepository.addMovie(movie);
@@ -49,15 +49,17 @@ export class MoviesService {
     deleteMovie(id: string) {
         const [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
         id = value.id;
 
         if (!this.moviesRepository.checkIfMovieExists(id)) {
-            return HttpStatus.NOT_FOUND;
+            throw new HttpException(
+                `No movie with id: ${id} was found.`,
+                HttpStatus.BAD_REQUEST,
+            );
         }
         this.moviesRepository.deleteMovie(id);
-        return HttpStatus.NO_CONTENT;
     }
 
     updateMovie(id: string, newMovie: MovieDto) {
@@ -67,20 +69,20 @@ export class MoviesService {
         );
 
         if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
         newMovie = value;
 
         [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new HttpException(error, HttpStatus.BAD_REQUEST);
         }
         id = value.id;
 
         if (!this.moviesRepository.checkIfMovieExists(id)) {
             throw new HttpException(
                 `No user with id: ${id} was found.`,
-                HttpStatus.NOT_FOUND,
+                HttpStatus.BAD_REQUEST,
             );
         }
 
