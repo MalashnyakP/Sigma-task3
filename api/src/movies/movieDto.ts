@@ -11,7 +11,7 @@ export class UpdateMovieDto {
     year: number;
 
     @ApiProperty({ type: String, description: 'maturoty level' })
-    maturity: string;
+    maturityLevel: string;
 
     @ApiProperty({ type: String, description: 'runtime' })
     runtime: string;

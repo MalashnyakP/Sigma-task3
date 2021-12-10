@@ -20,6 +20,10 @@ export class MoviesRepository {
     }
 
     public getMovies(offset: number, limit: number): [MovieDto[], number] {
+        if (this.movies.length <= offset) {
+            return [this.movies, this.movies.length];
+        }
+
         const moviesSelection = this.movies.slice(offset, limit);
         return [moviesSelection, this.movies.length];
     }

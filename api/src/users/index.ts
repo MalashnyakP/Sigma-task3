@@ -1,6 +1,6 @@
-export { UserDto, UpdateUserDto } from './userDto.js';
-export { UsersGuard } from './usersGuard.js';
-export { UserRepository } from './usersRepository.js';
-export { UsersService } from './userService.js';
-export { UsersController } from './usersController.js';
-export { UsersModule } from './usersModule.js';
+export { UserDto, UpdateUserDto } from './userDto';
+export { UsersGuard } from './usersGuard';
+export { UserRepository } from './usersRepository';
+export { UsersService } from './userService';
+export { UsersController } from './usersController';
+export { UsersModule } from './usersModule';

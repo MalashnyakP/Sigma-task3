@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { MoviesModule } from './movies/index.js';
 
-import { UsersModule } from './users/index.js';
+import { MoviesModule } from './movies';
+import { UsersModule } from './users';
 
 @Module({
     imports: [MoviesModule, UsersModule],

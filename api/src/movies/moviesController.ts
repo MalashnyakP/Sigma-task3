@@ -10,6 +10,7 @@ import {
     Put,
     Query,
     Version,
+    Res,
 } from '@nestjs/common';
 import {
     ApiBody,
@@ -21,8 +22,9 @@ import {
     ApiQuery,
     ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
+import { Responce } from 'express';
 
-import { MovieDto, UpdateMovieDto, MoviesService } from './index.js';
+import { MovieDto, UpdateMovieDto, MoviesService } from '.';
 
 @Controller('movies')
 export class MoviesController {
@@ -94,7 +96,8 @@ export class MoviesController {
     @ApiNoContentResponse({ description: 'User deleted' })
     @ApiNotFoundResponse({ description: 'No movie to delete' })
     @ApiUnprocessableEntityResponse({ description: 'Invalid id' })
-    deleteUser(@Param() params) {
-        this.moviesService.deleteMovie(params.id);
+    deleteUser(@Param() params, @Res() res: Responce) {
+        const statusCode = this.moviesService.deleteMovie(params.id);
+        res.status(statusCode).send();
     }
 }

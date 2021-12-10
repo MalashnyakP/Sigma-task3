@@ -1,26 +1,44 @@
 import Joi from 'joi';
 
-import { constants, userRoles } from '../constants/index.js';
+import { userRoles, utils } from '../constants';
 
-const { EMAIL_REGEX, PASS_REGEX } = constants;
+const { EMAIL_REGEX, PASS_REGEX } = utils;
 
-export class UsersGuard { static createUserValidator = Joi.object({
-        id: Joi.string().trim().required(),
-        name: Joi.string().trim().alphanum().min(3).max(20).required(),
-        email: Joi.string().trim().regex(EMAIL_REGEX).required(),
-        password: Joi.string().trim().regex(PASS_REGEX).required(),
-        role: Joi.string()
+export class UsersGuard {
+    private static userValidator = Joi.object({
+        id: Joi.string()
             .trim()
+            .alter({
+                post: (schema) => schema.required(),
+                put: (schema) => schema.forbidden(),
+            }),
+        name: Joi.string()
+            .trim()
+            .alphanum()
+            .min(3)
+            .max(20)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        email: Joi.string()
+            .trim()
+            .regex(EMAIL_REGEX)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        password: Joi.string()
+            .trim()
+            .regex(PASS_REGEX)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        role: Joi.number()
             .allow(...Object.values(userRoles))
-            .default(userRoles.USER),
-    });
-
-    public static updateUserValidator = Joi.object({
-        name: Joi.string().alphanum().min(3).max(20),
-        email: Joi.string().trim().regex(EMAIL_REGEX),
-        password: Joi.string().trim().regex(PASS_REGEX),
-        role: Joi.string()
-            .trim()
-            .allow(...Object.values(userRoles)),
+            .alter({
+                post: (schema) => schema.default(userRoles.USER),
+            }),
     }).min(1);
+
+    public static createUserValidator = UsersGuard.userValidator.tailor('post');
+    public static updateUserValidator = UsersGuard.userValidator.tailor('put');
 }

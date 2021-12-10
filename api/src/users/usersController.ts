@@ -10,6 +10,7 @@ import {
     Delete,
     Version,
     HttpStatus,
+    Res,
 } from '@nestjs/common';
 import {
     ApiBody,
@@ -21,8 +22,9 @@ import {
     ApiQuery,
     ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
+import { Responce } from 'express';
 
-import { UserDto, UpdateUserDto, UsersService } from './index.js';
+import { UserDto, UpdateUserDto, UsersService } from '.';
 
 @Controller('users')
 export class UsersController {
@@ -91,7 +93,8 @@ export class UsersController {
     @ApiNoContentResponse({ description: 'User deleted' })
     @ApiNotFoundResponse({ description: 'No user to delete' })
     @ApiUnprocessableEntityResponse({ description: 'Invalid id' })
-    deleteUser(@Param() params) {
-        this.usersService.deleteUser(params.id);
+    deleteUser(@Param() params, @Res() res: Responce) {
+        const statusCode = this.usersService.deleteUser(params.id);
+        res.status(statusCode).send();
     }
 }

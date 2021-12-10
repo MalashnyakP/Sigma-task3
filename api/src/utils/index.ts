@@ -1,1 +1,1 @@
-export { validateObject } from './validateObject.js';
+export { validateObject } from './validateObject';
