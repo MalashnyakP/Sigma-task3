@@ -1,3 +1,3 @@
-export { movieMaturity } from './movieMaturity';
+export { movieMaturityLevels } from './movieMaturityLevels';
 export { userRoles } from './userRoles';
 export { utils } from './utils';

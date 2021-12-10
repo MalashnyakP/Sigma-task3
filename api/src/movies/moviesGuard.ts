@@ -1,41 +1,79 @@
 import Joi from 'joi';
 
-import { movieMaturity, utils } from '../constants';
+import { movieMaturityLevels, utils } from '../constants';
 
-const { CURR_YEAR, RUNTIME_REGEX } = utils;
+const { RUNTIME_REGEX } = utils;
 
 export class MoviesGuard {
     private static staffSchema = Joi.string().trim().min(3).max(30);
 
-    public static createMovieValidator = Joi.object({
-        id: Joi.string().trim().required(),
-        title: Joi.string().trim().min(4).max(30).required(),
-        description: Joi.string().trim().min(4).max(30).required(),
-        year: Joi.number().min(1950).max(CURR_YEAR).required(),
+    private static movieValidator = Joi.object({
+        id: Joi.string()
+            .trim()
+            .alter({
+                post: (schema) => schema.required(),
+                put: (schema) => schema.forbidden(),
+            }),
+        title: Joi.string()
+            .trim()
+            .min(4)
+            .max(30)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        description: Joi.string()
+            .trim()
+            .min(4)
+            .max(30)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        year: Joi.number()
+            .min(1000)
+            .max(9999)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
         maturity: Joi.string()
             .trim()
-            .allow(...Object.values(movieMaturity))
-            .required(),
-        runtime: Joi.string().trim().regex(RUNTIME_REGEX).required(),
-        genre: Joi.string().trim().required(),
-        cast: Joi.array().min(2).items(MoviesGuard.staffSchema).required(),
-        director: MoviesGuard.staffSchema.required(),
-        logo: Joi.string().trim().required(),
-        backgroundImg: Joi.string().trim().required(),
-    });
-
-    public static updateMovieValidator = Joi.object({
-        title: Joi.string().trim().min(4).max(30),
-        description: Joi.string().trim().min(4).max(30),
-        year: Joi.number().min(1950).max(CURR_YEAR),
-        maturity: Joi.string()
+            .allow(...Object.values(movieMaturityLevels))
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        runtime: Joi.string()
             .trim()
-            .allow(...Object.values(movieMaturity)),
-        runtime: Joi.string().trim().regex(RUNTIME_REGEX),
-        genre: Joi.string().trim(),
-        cast: Joi.array().min(2).items(MoviesGuard.staffSchema),
-        director: MoviesGuard.staffSchema,
-        logo: Joi.string().trim(),
-        backgroundImg: Joi.string().trim(),
+            .regex(RUNTIME_REGEX)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        genre: Joi.string()
+            .trim()
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        cast: Joi.array()
+            .min(2)
+            .items(MoviesGuard.staffSchema)
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        director: MoviesGuard.staffSchema.alter({
+            post: (schema) => schema.required(),
+        }),
+        logo: Joi.string()
+            .trim()
+            .alter({
+                post: (schema) => schema.required(),
+            }),
+        backgroundImg: Joi.string()
+            .trim()
+            .alter({
+                post: (schema) => schema.required(),
+            }),
     }).min(1);
+
+    public static createMovieValidator =
+        MoviesGuard.movieValidator.tailor('post');
+    public static updateMovieValidator =
+        MoviesGuard.movieValidator.tailor('put');
 }

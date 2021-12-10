@@ -3,7 +3,7 @@ export class MovieDto {
     title: string;
     description: string;
     year: number;
-    maturity: string;
+    maturityLevel: string;
     runtime: string;
     genre: string;
     cast: string[];

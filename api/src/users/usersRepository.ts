@@ -22,6 +22,9 @@ export class UserRepository {
     }
 
     public getUsers(offset: number, limit: number): [UserDto[], number] {
+        if (this.users.length <= offset) {
+            return [this.users, this.users.length];
+        }
         const usersSelection = this.users.slice(offset, limit);
         return [usersSelection, this.users.length];
     }

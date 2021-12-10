@@ -10,7 +10,9 @@ import {
     Delete,
     Version,
     HttpStatus,
+    Res,
 } from '@nestjs/common';
+import { Responce } from 'express';
 
 import { UserDto, UsersService } from '.';
 
@@ -58,8 +60,8 @@ export class UsersController {
 
     @Delete(':id')
     @Version('1')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    deleteUser(@Param() params) {
-        this.usersService.deleteUser(params.id);
+    deleteUser(@Param() params, @Res() res: Responce) {
+        const statusCode = this.usersService.deleteUser(params.id);
+        res.status(statusCode).send();
     }
 }

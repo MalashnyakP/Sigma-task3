@@ -9,8 +9,11 @@ import {
     Post,
     Put,
     Query,
+    Res,
     Version,
 } from '@nestjs/common';
+import { Responce } from 'express';
+
 import { MovieDto, MoviesService } from '.';
 
 @Controller('movies')
@@ -21,7 +24,10 @@ export class MoviesController {
     @Version('1')
     @HttpCode(HttpStatus.OK)
     findAll(@Query('offset') offset = 0, @Query('limit') limit = 15) {
-        const [movies, count] = this.moviesService.getAllMovies(+offset, +limit);
+        const [movies, count] = this.moviesService.getAllMovies(
+            +offset,
+            +limit,
+        );
 
         return {
             movies,
@@ -57,8 +63,8 @@ export class MoviesController {
 
     @Delete(':id')
     @Version('1')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    deleteUser(@Param() params) {
-        this.moviesService.deleteMovie(params.id);
+    deleteUser(@Param() params, @Res() res: Responce) {
+        const statusCode = this.moviesService.deleteMovie(params.id);
+        res.status(statusCode).send();
     }
 }

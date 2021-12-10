@@ -17,7 +17,7 @@ export class UsersService {
     getUserById(id: string): UserDto {
         const [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
-            throw new HttpException(error, HttpStatus.BAD_REQUEST);
+            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         id = value.id;
@@ -39,7 +39,7 @@ export class UsersService {
         );
 
         if (error) {
-            throw new HttpException(error, HttpStatus.BAD_REQUEST);
+            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
         }
         user = value;
         this.userRepository.addUser(user);
@@ -50,7 +50,31 @@ export class UsersService {
     deleteUser(id: string) {
         const [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
-            throw new HttpException(error, HttpStatus.BAD_REQUEST);
+            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        id = value.id;
+
+        if (!this.userRepository.checkIfUserExists(id)) {
+            return HttpStatus.NOT_FOUND;
+        }
+        this.userRepository.deleteUser(id);
+        return HttpStatus.NO_CONTENT;
+    }
+
+    updateUser(id: string, newUser: UserDto) {
+        let [value, error] = validateObject(
+            UsersGuard.updateUserValidator,
+            newUser,
+        );
+
+        if (error) {
+            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        newUser = value;
+
+        [value, error] = validateObject(GenericGuard.idValidator, { id });
+        if (error) {
+            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
         }
         id = value.id;
 
@@ -60,26 +84,7 @@ export class UsersService {
                 HttpStatus.NOT_FOUND,
             );
         }
-        this.userRepository.deleteUser(id);
-    }
 
-    updateUser(id: string, newUser: UserDto) {
-        const [value, error] = validateObject(
-            UsersGuard.updateUserValidator,
-            newUser,
-        );
-
-        if (error) {
-            throw new HttpException(error, HttpStatus.BAD_REQUEST);
-        }
-        if (!this.userRepository.checkIfUserExists(id)) {
-            throw new HttpException(
-                `No user with id: ${id} was found.`,
-                HttpStatus.NOT_FOUND,
-            );
-        }
-
-        newUser = value;
         return this.userRepository.updateUser(id, newUser);
     }
 }
