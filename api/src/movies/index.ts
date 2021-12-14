@@ -1,4 +1,4 @@
-export { MovieDto } from './movieDto';
+export { MovieDto, UpdateMovieDto } from './movieDto';
 export { MoviesRepository } from './moviesRepository';
 export { MoviesGuard } from './moviesGuard';
 export { MoviesService } from './moviesService';

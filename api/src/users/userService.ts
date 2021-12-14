@@ -84,7 +84,6 @@ export class UsersService {
                 HttpStatus.NOT_FOUND,
             );
         }
-
         return this.userRepository.updateUser(id, newUser);
     }
 }

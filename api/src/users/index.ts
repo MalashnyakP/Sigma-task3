@@ -1,4 +1,4 @@
-export { UserDto } from './userDto';
+export { UserDto, UpdateUserDto } from './userDto';
 export { UsersGuard } from './usersGuard';
 export { UserRepository } from './usersRepository';
 export { UsersService } from './userService';
