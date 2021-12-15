@@ -36,8 +36,11 @@ export class UsersController {
     @ApiOkResponse({ description: 'Get filtered users' })
     @ApiQuery({ name: 'offset', required: false })
     @ApiQuery({ name: 'limit', required: false })
-    findAll(@Query('offset') offset = 0, @Query('limit') limit = 25) {
-        const [users, count] = this.usersService.getAllUsers(+offset, +limit);
+    async findAll(@Query('offset') offset = 0, @Query('limit') limit = 25) {
+        const [users, count] = await this.usersService.getAllUsers(
+            +offset,
+            +limit,
+        );
 
         return {
             users,
@@ -54,8 +57,8 @@ export class UsersController {
     @ApiOkResponse({ description: 'Get user by id' })
     @ApiUnprocessableEntityResponse({ description: 'Invalid id' })
     @ApiNotFoundResponse({ description: 'No user with such id' })
-    findById(@Param() param) {
-        const user: UserDto = this.usersService.getUserById(param.id);
+    async findById(@Param() param) {
+        const user: UserDto = await this.usersService.getUserById(param.id);
         return user;
     }
 
@@ -67,8 +70,8 @@ export class UsersController {
     @ApiUnprocessableEntityResponse({
         description: 'User data failed validation',
     })
-    create(@Body() user: UserDto) {
-        const newUser = this.usersService.createUser(user);
+    async create(@Body() user: UserDto) {
+        const newUser = await this.usersService.createUser(user);
         return newUser;
     }
 
@@ -81,8 +84,8 @@ export class UsersController {
     @ApiUnprocessableEntityResponse({
         description: 'Invalid id or User data to update failed validation',
     })
-    updateUser(@Param() params, @Body() body) {
-        const updatedUser = this.usersService.updateUser(params.id, body);
+    async updateUser(@Param() params, @Body() body) {
+        const updatedUser = await this.usersService.updateUser(params.id, body);
         return updatedUser;
     }
 
@@ -93,8 +96,17 @@ export class UsersController {
     @ApiNoContentResponse({ description: 'User deleted' })
     @ApiNotFoundResponse({ description: 'No user to delete' })
     @ApiUnprocessableEntityResponse({ description: 'Invalid id' })
-    deleteUser(@Param() params, @Res() res: Responce) {
-        const statusCode = this.usersService.deleteUser(params.id);
+    async deleteUser(@Param() params, @Res() res: Responce) {
+        const statusCode = await this.usersService.deleteUser(params.id);
         res.status(statusCode).send();
+    }
+
+    @Put(':id/favorite')
+    @Version('1')
+    @HttpCode(HttpStatus.CREATED)
+    async updateUsersFavorites(@Param() param, @Body() body) {
+        const user = await this.usersService.getUserById(param.id);
+        user.favorites.push(body.movie_id);
+        //дописати апдейтом
     }
 }
