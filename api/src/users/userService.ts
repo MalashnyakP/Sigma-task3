@@ -1,27 +1,42 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
-import { UserDto, UsersGuard, UserRepository } from '.';
+import {
+    UserDto,
+    UsersGuard,
+    UserInMemoryRepository,
+    UserMongoDBRepository,
+} from '.';
 import { validateObject } from '../utils';
 import { GenericGuard } from '../genericGuard';
+import { dbNames } from '../constants';
 
 @Injectable()
 export class UsersService {
-    constructor(private userRepository: UserRepository) {
-        this.userRepository = new UserRepository([]);
+    private userRepository: UserMongoDBRepository;
+
+    constructor(
+        @InjectModel(dbNames.USER) private readonly userModel: Model<UserDto>,
+    ) {
+        this.userRepository = new UserMongoDBRepository(userModel);
     }
 
-    getAllUsers(offset: number, limit: number): [UserDto[], number] {
-        return this.userRepository.getUsers(offset, limit);
+    async getAllUsers(
+        offset: number,
+        limit: number,
+    ): Promise<[UserDto[], number]> {
+        return await this.userRepository.getUsers(offset, limit);
     }
 
-    getUserById(id: string): UserDto {
+    async getUserById(id: string): Promise<UserDto> {
         const [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
             throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         id = value.id;
-        const user = this.userRepository.getUser(id);
+        const user = await this.userRepository.getUser(id);
         if (!user) {
             throw new HttpException(
                 `No user with id: ${id} was found.`,
@@ -32,7 +47,7 @@ export class UsersService {
         return user;
     }
 
-    createUser(user: UserDto): UserDto {
+    async createUser(user: UserDto): Promise<UserDto> {
         const [value, error] = validateObject(
             UsersGuard.createUserValidator,
             user,
@@ -42,12 +57,12 @@ export class UsersService {
             throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
         }
         user = value;
-        this.userRepository.addUser(user);
+        const newUser = await this.userRepository.addUser(user);
 
-        return user;
+        return newUser;
     }
 
-    deleteUser(id: string) {
+    async deleteUser(id: string) {
         const [value, error] = validateObject(GenericGuard.idValidator, { id });
         if (error) {
             throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -57,11 +72,11 @@ export class UsersService {
         if (!this.userRepository.checkIfUserExists(id)) {
             return HttpStatus.NOT_FOUND;
         }
-        this.userRepository.deleteUser(id);
+        await this.userRepository.deleteUser(id);
         return HttpStatus.NO_CONTENT;
     }
 
-    updateUser(id: string, newUser: UserDto) {
+    async updateUser(id: string, newUser: UserDto) {
         let [value, error] = validateObject(
             UsersGuard.updateUserValidator,
             newUser,
@@ -84,6 +99,7 @@ export class UsersService {
                 HttpStatus.NOT_FOUND,
             );
         }
-        return this.userRepository.updateUser(id, newUser);
+        const updatedUser = await this.userRepository.updateUser(id, newUser);
+        return updatedUser;
     }
 }

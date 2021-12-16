@@ -36,8 +36,8 @@ export class MoviesController {
     @ApiOkResponse({ description: 'Get filtered movies' })
     @ApiQuery({ name: 'offset', required: false })
     @ApiQuery({ name: 'limit', required: false })
-    findAll(@Query('offset') offset = 0, @Query('limit') limit = 15) {
-        const [movies, count] = this.moviesService.getAllMovies(
+    async findAll(@Query('offset') offset = 0, @Query('limit') limit = 15) {
+        const [movies, count] = await this.moviesService.getAllMovies(
             +offset,
             +limit,
         );
@@ -57,8 +57,8 @@ export class MoviesController {
     @ApiOkResponse({ description: 'Get movie by id' })
     @ApiUnprocessableEntityResponse({ description: 'Invalid id' })
     @ApiNotFoundResponse({ description: 'No movie with such id' })
-    findById(@Param() param) {
-        const movie: MovieDto = this.moviesService.getMovieById(param.id);
+    async findById(@Param() param) {
+        const movie: MovieDto = await this.moviesService.getMovieById(param.id);
         return movie;
     }
 
@@ -70,8 +70,8 @@ export class MoviesController {
     @ApiUnprocessableEntityResponse({
         description: 'Movie data failed validation',
     })
-    create(@Body() movie: MovieDto) {
-        const newMovie = this.moviesService.createMovie(movie);
+    async create(@Body() movie: MovieDto) {
+        const newMovie = await this.moviesService.createMovie(movie);
         return newMovie;
     }
 
@@ -84,8 +84,11 @@ export class MoviesController {
     @ApiUnprocessableEntityResponse({
         description: 'Invalid id or Movie data to update failed validation',
     })
-    updateUser(@Param() params, @Body() body) {
-        const updatedMovie = this.moviesService.updateMovie(params.id, body);
+    async updateUser(@Param() params, @Body() body) {
+        const updatedMovie = await this.moviesService.updateMovie(
+            params.id,
+            body,
+        );
         return updatedMovie;
     }
 
@@ -96,8 +99,8 @@ export class MoviesController {
     @ApiNoContentResponse({ description: 'User deleted' })
     @ApiNotFoundResponse({ description: 'No movie to delete' })
     @ApiUnprocessableEntityResponse({ description: 'Invalid id' })
-    deleteUser(@Param() params, @Res() res: Responce) {
-        const statusCode = this.moviesService.deleteMovie(params.id);
+    async deleteUser(@Param() params, @Res() res: Responce) {
+        const statusCode = await this.moviesService.deleteMovie(params.id);
         res.status(statusCode).send();
     }
 }

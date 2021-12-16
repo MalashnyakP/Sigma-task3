@@ -2,10 +2,10 @@ import Joi from 'joi';
 
 import { movieMaturityLevels, utils } from '../constants';
 
-const { RUNTIME_REGEX } = utils;
+const { RUNTIME_REGEX, MONGO_BD_ID_REGEX } = utils;
 
 export class MoviesGuard {
-    private static staffSchema = Joi.string().trim().min(3).max(30);
+    private static staffSchema = Joi.string().trim().regex(MONGO_BD_ID_REGEX);
 
     private static movieValidator = Joi.object({
         id: Joi.string()
@@ -52,14 +52,19 @@ export class MoviesGuard {
                 post: (schema) => schema.required(),
             }),
         cast: Joi.array()
-            .min(2)
+            .min(1)
             .items(MoviesGuard.staffSchema)
+            .unique()
             .alter({
                 post: (schema) => schema.required(),
             }),
-        director: MoviesGuard.staffSchema.alter({
-            post: (schema) => schema.required(),
-        }),
+        director: Joi.array()
+            .min(1)
+            .items(MoviesGuard.staffSchema)
+            .unique()
+            .alter({
+                post: (schema) => schema.required(),
+            }),
         logo: Joi.string()
             .trim()
             .alter({

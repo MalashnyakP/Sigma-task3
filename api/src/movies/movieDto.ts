@@ -10,20 +10,20 @@ export class UpdateMovieDto {
     @ApiProperty({ type: Number, description: 'year' })
     year: number;
 
-    @ApiProperty({ type: String, description: 'maturoty level' })
-    maturityLevel: string;
+    @ApiProperty({ type: Number, description: 'maturity level' })
+    maturityLevel: number;
 
     @ApiProperty({ type: String, description: 'runtime' })
     runtime: string;
 
-    @ApiProperty({ type: String, description: 'genre' })
-    genre: string;
+    @ApiProperty({ type: Number, description: 'genre' })
+    genre: number[];
 
     @ApiProperty({ type: String, description: 'cast' })
     cast: string[];
 
     @ApiProperty({ type: String, description: 'director' })
-    director: string;
+    director: string[];
 
     @ApiProperty({ type: String, description: 'logo' })
     logo: string;
