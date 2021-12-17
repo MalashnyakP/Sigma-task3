@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { string } from 'joi';
 import { Model } from 'mongoose';
 
 import { MovieDto, MoviesGuard, MoviesRepository } from '.';
 import { CastMemberDto, CastMemberMongoDBRepository } from '../castMembers';
-import { castMembersRoles, dbNames } from '../constants';
+import { dbNames } from '../constants';
 import { GenericGuard } from '../genericGuard';
 import { validateObject } from '../utils';
 import { MovieMongoDBRepository } from './moviesRepository';
@@ -20,41 +21,26 @@ export class MoviesService {
         private readonly castMembersModel: Model<CastMemberDto>,
     ) {
         this.moviesRepository = new MovieMongoDBRepository(moviesModel);
-        this.castMembersRepository = new CastMemberMongoDBRepository(
-            castMembersModel,
-        );
+        this.castMembersRepository = new CastMemberMongoDBRepository(castMembersModel);
     }
 
-    async getAllMovies(
-        offset: number,
-        limit: number,
-    ): Promise<[MovieDto[], number]> {
-        return await this.moviesRepository.getMovies(offset, limit);
+    async getAllMovies(offset: number, limit: number, userAge: number): Promise<[MovieDto[], number]> {
+        return await this.moviesRepository.getMovies(offset, limit, userAge);
     }
 
     async getMovieById(id: string): Promise<MovieDto> {
-        const [value, error] = validateObject(GenericGuard.idValidator, { id });
-        if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        id = this.validateId(id);
 
-        id = value.id;
         const movie = await this.moviesRepository.getMovie(id);
         if (!movie) {
-            throw new HttpException(
-                `No movie with id: ${id} was found.`,
-                HttpStatus.NOT_FOUND,
-            );
+            throw new HttpException(`No movie with id: ${id} was found.`, HttpStatus.NOT_FOUND);
         }
 
         return movie;
     }
 
     async createMovie(movie: MovieDto): Promise<MovieDto> {
-        const [value, error] = validateObject(
-            MoviesGuard.createMovieValidator,
-            movie,
-        );
+        const [value, error] = validateObject(MoviesGuard.createMovieValidator, movie);
 
         if (error) {
             throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
@@ -62,22 +48,15 @@ export class MoviesService {
         movie = value;
 
         const { cast, director } = movie;
-        await this.checkIfCastMembersExists(castMembersRoles.ACTOR, cast);
-        await this.checkIfCastMembersExists(
-            castMembersRoles.DIRECTOR,
-            director,
-        );
+        movie.cast = await this.createCastMembersIfNone(cast);
+        movie.director = await this.createCastMembersIfNone(director);
 
         const newMovie = await this.moviesRepository.addMovie(movie);
         return newMovie;
     }
 
     async deleteMovie(id: string) {
-        const [value, error] = validateObject(GenericGuard.idValidator, { id });
-        if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        id = value.id;
+        id = this.validateId(id);
 
         const movieExists = await this.moviesRepository.checkIfMovieExists(id);
         if (!movieExists) {
@@ -88,58 +67,60 @@ export class MoviesService {
     }
 
     async updateMovie(id: string, newMovie: MovieDto) {
-        let [value, error] = validateObject(
-            MoviesGuard.updateMovieValidator,
-            newMovie,
-        );
+        let [value, error] = validateObject(MoviesGuard.updateMovieValidator, newMovie);
 
         if (error) {
             throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
         }
         newMovie = value;
 
-        [value, error] = validateObject(GenericGuard.idValidator, { id });
-        if (error) {
-            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-        id = value.id;
+        id = this.validateId(id);
 
         const movieExists = await this.moviesRepository.checkIfMovieExists(id);
         if (!movieExists) {
-            throw new HttpException(
-                `No user with id: ${id} was found.`,
-                HttpStatus.NOT_FOUND,
-            );
+            throw new HttpException(`No movie with id: ${id} was found.`, HttpStatus.NOT_FOUND);
         }
 
         const { cast, director } = newMovie;
-        await this.checkIfCastMembersExists(castMembersRoles.ACTOR, cast);
-        await this.checkIfCastMembersExists(
-            castMembersRoles.DIRECTOR,
-            director,
-        );
+        if (cast) {
+            newMovie.cast = await this.createCastMembersIfNone(cast);
+        }
+        if (director) {
+            newMovie.director = await this.createCastMembersIfNone(director);
+        }
 
-        const updatedMovie = await this.moviesRepository.updateMovie(
-            id,
-            newMovie,
-        );
+        const updatedMovie = await this.moviesRepository.updateMovie(id, newMovie);
         return updatedMovie;
     }
 
-    private async checkIfCastMembersExists(
-        role: number,
-        castMembers: string[],
-    ): Promise<void> {
+    private async checkIfCastMembersExists(castMembers: string[]): Promise<void> {
         for (let i = 0; i < castMembers.length; ++i) {
-            const castMember = await this.castMembersRepository.getCastMember(
-                castMembers[i],
-            );
-            if (!castMember || castMember.role !== role) {
-                throw new HttpException(
-                    `Cast member with id: ${castMembers[i]} and role: ${role} doen't exist`,
-                    HttpStatus.NOT_FOUND,
-                );
+            const exists = await this.castMembersRepository.checkIfCastMemberExists(castMembers[i]);
+            if (!exists) {
+                throw new HttpException(`Cast member with id: ${castMembers[i]} doesn't exist`, HttpStatus.NOT_FOUND);
             }
         }
+    }
+
+    private async createCastMembersIfNone(castMembers: string[]) {
+        if (castMembers.every((item) => typeof item === 'string')) {
+            await this.checkIfCastMembersExists(castMembers);
+        } else {
+            const castDto = castMembers as unknown as CastMemberDto;
+            for (let i = 0; i < castMembers.length; ++i) {
+                const { id } = await this.castMembersRepository.addCastMember(castDto[i]);
+                castMembers[i] = id;
+            }
+        }
+
+        return castMembers;
+    }
+
+    private validateId(id: string) {
+        const [value, error] = validateObject(GenericGuard.idValidator, { id });
+        if (error) {
+            throw new HttpException(error, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        return value.id;
     }
 }

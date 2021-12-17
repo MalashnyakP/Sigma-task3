@@ -26,7 +26,7 @@ export class UpdateMovieDto {
     director: string[];
 
     @ApiProperty({ type: String, description: 'logo' })
-    logo: string;
+    poster: string;
 
     @ApiProperty({ type: String, description: 'backgrounf image' })
     backgroundImg: string;

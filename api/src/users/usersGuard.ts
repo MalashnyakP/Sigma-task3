@@ -2,12 +2,12 @@ import Joi from 'joi';
 
 import { userRoles, utils } from '../constants';
 
-const { EMAIL_REGEX, PASS_REGEX, MONGO_BD_ID_REGEX } = utils;
+const { EMAIL_REGEX, PASS_REGEX, MONGO_DB_ID_REGEX } = utils;
 
 export class UsersGuard {
     private static watchlistValidator = Joi.object({
         title: Joi.string().min(3).max(40),
-        movies: Joi.array().items(Joi.string().regex(MONGO_BD_ID_REGEX)),
+        movies: Joi.array().items(Joi.string().regex(MONGO_DB_ID_REGEX)),
     });
 
     private static userValidator = Joi.object({
@@ -42,8 +42,8 @@ export class UsersGuard {
             .alter({
                 post: (schema) => schema.required(),
             }),
-        watchlist: Joi.array().items(UsersGuard.watchlistValidator),
-        favorites: Joi.array().items(Joi.string().regex(MONGO_BD_ID_REGEX)),
+        watchlists: Joi.array().items(UsersGuard.watchlistValidator).unique(),
+        favorites: Joi.array().items(Joi.string().regex(MONGO_DB_ID_REGEX)).unique(),
     }).min(1);
 
     public static createUserValidator = UsersGuard.userValidator.tailor('post');
