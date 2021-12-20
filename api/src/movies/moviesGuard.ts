@@ -1,11 +1,12 @@
 import Joi from 'joi';
+import { CastMemberGuard } from '../castMembers';
 
-import { movieMaturityLevels, utils } from '../constants';
+import { genres, movieMaturityLevels, utils } from '../constants';
 
-const { RUNTIME_REGEX, MONGO_BD_ID_REGEX } = utils;
+const { RUNTIME_REGEX, MONGO_DB_ID_REGEX } = utils;
 
 export class MoviesGuard {
-    private static staffSchema = Joi.string().trim().regex(MONGO_BD_ID_REGEX);
+    private static staffSchema = Joi.string().trim().regex(MONGO_DB_ID_REGEX);
 
     private static movieValidator = Joi.object({
         id: Joi.string()
@@ -34,8 +35,7 @@ export class MoviesGuard {
             .alter({
                 post: (schema) => schema.required(),
             }),
-        maturity: Joi.string()
-            .trim()
+        maturityLevel: Joi.number()
             .allow(...Object.values(movieMaturityLevels))
             .alter({
                 post: (schema) => schema.required(),
@@ -46,26 +46,34 @@ export class MoviesGuard {
             .alter({
                 post: (schema) => schema.required(),
             }),
-        genre: Joi.string()
-            .trim()
-            .alter({
-                post: (schema) => schema.required(),
-            }),
-        cast: Joi.array()
-            .min(1)
-            .items(MoviesGuard.staffSchema)
+        genre: Joi.array()
+            .items(Joi.number())
+            .allow(...Object.values(genres))
             .unique()
             .alter({
                 post: (schema) => schema.required(),
             }),
-        director: Joi.array()
-            .min(1)
-            .items(MoviesGuard.staffSchema)
-            .unique()
-            .alter({
-                post: (schema) => schema.required(),
-            }),
-        logo: Joi.string()
+        cast: Joi.alternatives([
+            Joi.array()
+                .min(1)
+                .items(MoviesGuard.staffSchema)
+                .unique()
+                .alter({
+                    post: (schema) => schema.required(),
+                }),
+            Joi.array().items(CastMemberGuard.createCastMemberValidator),
+        ]),
+        director: Joi.alternatives([
+            Joi.array()
+                .min(1)
+                .items(MoviesGuard.staffSchema)
+                .unique()
+                .alter({
+                    post: (schema) => schema.required(),
+                }),
+            Joi.array().items(CastMemberGuard.createCastMemberValidator),
+        ]),
+        poster: Joi.string()
             .trim()
             .alter({
                 post: (schema) => schema.required(),
@@ -77,8 +85,6 @@ export class MoviesGuard {
             }),
     }).min(1);
 
-    public static createMovieValidator =
-        MoviesGuard.movieValidator.tailor('post');
-    public static updateMovieValidator =
-        MoviesGuard.movieValidator.tailor('put');
+    public static createMovieValidator = MoviesGuard.movieValidator.tailor('post');
+    public static updateMovieValidator = MoviesGuard.movieValidator.tailor('put');
 }

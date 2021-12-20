@@ -15,7 +15,7 @@
         "@nestjs/swagger": "^5.1.5",
         "express": "^4.17.1",
         "joi": "^17.5.0",
-        "mongoose": "^6.1.1",
+        "mongoose": "^6.1.2",
         "swagger-ui-express": "^4.2.0"
     },
     "devDependencies": {

@@ -13,8 +13,12 @@ export class CastMember {
     @Prop({ required: true })
     age: number;
 
-    @Prop({ require: true, enum: Object.values(castMembersRoles) })
-    role: number;
+    @Prop({
+        require: true,
+        enum: Object.values(castMembersRoles),
+        type: [Number],
+    })
+    role: number[];
 }
 
 export const CastMemberSchema = SchemaFactory.createForClass(CastMember);

@@ -8,11 +8,12 @@ export class CastMemberGuard {
             .trim()
             .alphanum()
             .min(3)
-            .max(20)
+            .max(50)
             .alter({
                 post: (schema) => schema.required(),
             }),
-        role: Joi.number()
+        role: Joi.array()
+            .items(Joi.number())
             .allow(...Object.values(castMembersRoles))
             .alter({
                 post: (schema) => schema.default(castMembersRoles.ACTOR),
@@ -25,8 +26,6 @@ export class CastMemberGuard {
             }),
     }).min(1);
 
-    public static createCastMemberValidator =
-        CastMemberGuard.castMemberValidator.tailor('post');
-    public static updateCastMemberValidator =
-        CastMemberGuard.castMemberValidator.tailor('put');
+    public static createCastMemberValidator = CastMemberGuard.castMemberValidator.tailor('post');
+    public static updateCastMemberValidator = CastMemberGuard.castMemberValidator.tailor('put');
 }

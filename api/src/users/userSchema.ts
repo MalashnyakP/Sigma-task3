@@ -2,7 +2,7 @@ import { Schema, SchemaFactory, Prop } from '@nestjs/mongoose';
 import { Types, Document, SchemaTypes } from 'mongoose';
 
 import { dbNames, userRoles } from '../constants';
-import { WatchlistDto } from './watchlists';
+import { WatchlistDto } from '../watchlists';
 
 export type UserDocument = User & Document;
 
@@ -11,7 +11,7 @@ export class User {
     @Prop({ required: true })
     name: string;
 
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true, unique: true, index: true })
     email: string;
 
     @Prop({ required: true })

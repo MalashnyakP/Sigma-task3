@@ -1,16 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { utils } from './constants';
 
-import { CastMembersModule } from './castMembers';
 import { MoviesModule } from './movies';
 import { UsersModule } from './users';
 
 @Module({
-    imports: [
-        MoviesModule,
-        UsersModule,
-        CastMembersModule,
-        MongooseModule.forRoot('mongodb://localhost:27017/movie_streaming'),
-    ],
+    imports: [MoviesModule, UsersModule, MongooseModule.forRoot(utils.MONGO_DB_URL)],
 })
 export class AppModule {}

@@ -1,17 +1,4 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    HttpCode,
-    HttpStatus,
-    Param,
-    Post,
-    Put,
-    Query,
-    Version,
-    Res,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Version, Res } from '@nestjs/common';
 import {
     ApiBody,
     ApiCreatedResponse,
@@ -36,11 +23,8 @@ export class MoviesController {
     @ApiOkResponse({ description: 'Get filtered movies' })
     @ApiQuery({ name: 'offset', required: false })
     @ApiQuery({ name: 'limit', required: false })
-    async findAll(@Query('offset') offset = 0, @Query('limit') limit = 15) {
-        const [movies, count] = await this.moviesService.getAllMovies(
-            +offset,
-            +limit,
-        );
+    async findAll(@Query('offset') offset = 0, @Query('limit') limit = 15, @Body() body) {
+        const [movies, count] = await this.moviesService.getAllMovies(+offset, +limit, body.age);
 
         return {
             movies,
@@ -85,10 +69,7 @@ export class MoviesController {
         description: 'Invalid id or Movie data to update failed validation',
     })
     async updateUser(@Param() params, @Body() body) {
-        const updatedMovie = await this.moviesService.updateMovie(
-            params.id,
-            body,
-        );
+        const updatedMovie = await this.moviesService.updateMovie(params.id, body);
         return updatedMovie;
     }
 

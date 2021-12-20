@@ -1,7 +1,7 @@
 export const movieMaturityLevels = {
-    G: 0,
-    PG: 1,
-    PG_13: 2,
-    R: 3,
-    NC_17: 4,
+    ALL: 0,
+    SEVEN_PLUS: 1,
+    THIRTEEN_PLUS: 2,
+    SIXTEEN_PLUS: 3,
+    EIGHTTEEN_PLUS: 4,
 };

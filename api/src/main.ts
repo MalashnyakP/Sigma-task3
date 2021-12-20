@@ -13,14 +13,10 @@ async function bootstrap() {
         type: VersioningType.URI,
     });
 
-    const options = new DocumentBuilder()
-        .setTitle('Movies API')
-        .setDescription('Korean movies API')
-        .setVersion('1')
-        .build();
+    const options = new DocumentBuilder().setTitle('Movies API').setDescription('Korean movies API').setVersion('1').build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('api', app, document);
-  
+
     await app.listen(5000);
 }
 bootstrap();

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { WatchlistDto } from './watchlists';
+import { WatchlistDto } from '../watchlists';
 
 export class UpdateUserDto {
     @ApiProperty({ type: String, description: 'name' })
